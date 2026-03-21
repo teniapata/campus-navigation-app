@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import Image from "next/image";
 
 export function UserMenu() {
   const { data: session, status } = useSession();
@@ -47,9 +48,11 @@ export function UserMenu() {
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 focus:outline-none">
           {session.user.image ? (
-            <img
+            <Image
               src={session.user.image}
               alt={session.user.name || "User"}
+              width={32}
+              height={32}
               className="w-8 h-8 rounded-full"
             />
           ) : (

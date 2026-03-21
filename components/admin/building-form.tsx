@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -22,7 +23,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-import { Loader2 } from "lucide-react";
+import { Loader2, LocateFixed } from "lucide-react";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 const buildingFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -65,6 +67,8 @@ export function BuildingForm({
   onSubmit,
   isLoading,
 }: BuildingFormProps) {
+  const [isLocating, setIsLocating] = useState(false);
+
   const form = useForm<BuildingFormValues>({
     resolver: zodResolver(buildingFormSchema),
     defaultValues: {
@@ -184,6 +188,56 @@ export function BuildingForm({
           />
         </div>
 
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Location Coordinates</span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={isLocating}
+              onClick={() => {
+                if (!navigator.geolocation) {
+                  alert("Geolocation is not supported by your browser");
+                  return;
+                }
+                setIsLocating(true);
+                navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    form.setValue("lat", parseFloat(lat.toFixed(6)));
+                    form.setValue("lng", parseFloat(lng.toFixed(6)));
+
+                    // Estimate mapX/mapY relative to campus bounds
+                    // Campus approx bounds: lat 6.670-6.678, lng 3.154-3.163
+                    const mapX = Math.min(100, Math.max(0, ((lng - 3.154) / (3.163 - 3.154)) * 100));
+                    const mapY = Math.min(100, Math.max(0, ((lat - 6.678) / (6.670 - 6.678)) * 100));
+                    form.setValue("mapX", parseFloat(mapX.toFixed(1)));
+                    form.setValue("mapY", parseFloat(mapY.toFixed(1)));
+
+                    setIsLocating(false);
+                  },
+                  (error) => {
+                    console.error("Geolocation error:", error);
+                    alert("Unable to get your location. Please check permissions.");
+                    setIsLocating(false);
+                  },
+                  { enableHighAccuracy: true, timeout: 10000 }
+                );
+              }}
+              className="flex items-center gap-1.5"
+            >
+              {isLocating ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <LocateFixed className="w-3.5 h-3.5" />
+              )}
+              {isLocating ? "Getting location..." : "Use Current Location"}
+            </Button>
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <FormField
             control={form.control}
@@ -277,9 +331,9 @@ export function BuildingForm({
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image URL</FormLabel>
+              <FormLabel>Building Image</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com/image.jpg" {...field} />
+                <ImageUpload value={field.value} onChange={field.onChange} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -15,7 +15,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex h-screen bg-neutral-50">
+    <div className="flex h-screen bg-neutral-50 dark:bg-neutral-950">
       <AdminSidebar userRole={session.user.role} />
       <main className="flex-1 overflow-auto p-6">{children}</main>
     </div>

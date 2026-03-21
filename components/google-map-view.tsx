@@ -46,24 +46,25 @@ interface CustomLocation {
 
 interface GoogleMapViewProps {
   buildings: IBuilding[];
-  selectedBuilding: IBuilding | null;
+  selectedBuilding?: IBuilding | null;
   onSelectBuilding: (building: IBuilding) => void;
   fromBuilding: IBuilding | null;
   toBuilding: IBuilding | null;
   navigationMode: boolean;
   onDirectionsCalculated?: (result: google.maps.DirectionsResult) => void;
   customFromLocation?: CustomLocation | null;
+  travelMode?: string;
 }
 
 export function GoogleMapView({
   buildings,
-  selectedBuilding,
   onSelectBuilding,
   fromBuilding,
   toBuilding,
   navigationMode,
   onDirectionsCalculated,
   customFromLocation,
+  travelMode = "WALKING",
 }: GoogleMapViewProps) {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
@@ -113,17 +114,24 @@ export function GoogleMapView({
 
     // Only calculate if we have both origin and destination
     if (!origin || !destination) {
-      setDirections(null);
+      setDirections(null); // eslint-disable-line react-hooks/set-state-in-effect
       return;
     }
 
     const directionsService = new google.maps.DirectionsService();
 
+    const googleTravelMode =
+      travelMode === "DRIVING"
+        ? google.maps.TravelMode.DRIVING
+        : travelMode === "TRANSIT"
+        ? google.maps.TravelMode.TRANSIT
+        : google.maps.TravelMode.WALKING;
+
     directionsService.route(
       {
         origin,
         destination,
-        travelMode: google.maps.TravelMode.WALKING,
+        travelMode: googleTravelMode,
       },
       (result, status) => {
         if (status === google.maps.DirectionsStatus.OK && result) {
@@ -143,12 +151,12 @@ export function GoogleMapView({
         }
       }
     );
-  }, [isLoaded, fromBuilding, toBuilding, customFromLocation, map, onDirectionsCalculated]);
+  }, [isLoaded, fromBuilding, toBuilding, customFromLocation, map, onDirectionsCalculated, travelMode]);
 
   // Clear directions when navigation mode is off
   useEffect(() => {
     if (!navigationMode) {
-      setDirections(null);
+      setDirections(null); // eslint-disable-line react-hooks/set-state-in-effect
     }
   }, [navigationMode]);
 
@@ -231,8 +239,8 @@ export function GoogleMapView({
         const isFrom = fromBuilding?.id === building.id;
         const isTo = toBuilding?.id === building.id;
         const position = {
-          lat: building.geoCoordinates?.lat || CU_CENTER.lat + (Math.random() - 0.5) * 0.01,
-          lng: building.geoCoordinates?.lng || CU_CENTER.lng + (Math.random() - 0.5) * 0.01,
+          lat: building.geoCoordinates?.lat || CU_CENTER.lat,
+          lng: building.geoCoordinates?.lng || CU_CENTER.lng,
         };
 
         return (

@@ -31,8 +31,8 @@ export default async function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900">Dashboard</h1>
-        <p className="text-neutral-600">
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Dashboard</h1>
+        <p className="text-neutral-600 dark:text-neutral-400">
           Welcome back, {session?.user.name?.split(" ")[0]}
         </p>
       </div>
@@ -40,7 +40,7 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-neutral-600">
+            <CardTitle className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
               Total Buildings
             </CardTitle>
             <Building2 className="w-4 h-4 text-blue-500" />
@@ -52,7 +52,7 @@ export default async function AdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-neutral-600">
+            <CardTitle className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
               Total Events
             </CardTitle>
             <Calendar className="w-4 h-4 text-purple-500" />
@@ -64,7 +64,7 @@ export default async function AdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-neutral-600">
+            <CardTitle className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
               Registered Users
             </CardTitle>
             <Users className="w-4 h-4 text-green-500" />
@@ -76,7 +76,7 @@ export default async function AdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-neutral-600">
+            <CardTitle className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
               Upcoming Events
             </CardTitle>
             <MapPin className="w-4 h-4 text-amber-500" />
@@ -104,13 +104,13 @@ export default async function AdminDashboard() {
                   className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg"
                 >
                   <div>
-                    <p className="font-medium text-neutral-900">{event.title}</p>
+                    <p className="font-medium text-neutral-900 dark:text-neutral-100">{event.title}</p>
                     <p className="text-sm text-neutral-500">
                       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       {(event.building as any)?.name || "Unknown location"}
                     </p>
                   </div>
-                  <div className="text-sm text-neutral-600">
+                  <div className="text-sm text-neutral-600 dark:text-neutral-400">
                     {new Date(event.startDate).toLocaleDateString()}
                   </div>
                 </div>

@@ -126,8 +126,8 @@ export default function EditBuildingPage({
           </Button>
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Edit Building</h1>
-          <p className="text-neutral-600">{building.name}</p>
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Edit Building</h1>
+          <p className="text-neutral-600 dark:text-neutral-400">{building.name}</p>
         </div>
       </div>
 

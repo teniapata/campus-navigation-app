@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Campus Navigator - Covenant University
+
+A full-stack campus navigation app built with Next.js for Covenant University. Features interactive Google Maps, real-time directions with voice navigation, building management, events, and saved locations.
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Database**: MongoDB (Mongoose ODM)
+- **Auth**: NextAuth.js (Google OAuth + Credentials)
+- **Maps**: Google Maps JavaScript API
+- **UI**: Tailwind CSS 4, Radix UI, shadcn/ui
+- **Voice**: Web Speech API
+
+## Features
+
+- Interactive campus map with color-coded building markers
+- Multi-mode directions (Walking, Driving, Transit)
+- Voice-guided turn-by-turn navigation (GPS-triggered)
+- Building search, filtering, and detail views
+- Event management with category filtering
+- Save/bookmark favorite locations
+- Admin dashboard (buildings CRUD, events CRUD, user management)
+- Dark mode support
+- Image upload for buildings and events
+- Accessibility-aware routing
+- Responsive design (mobile + desktop)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18+
+- MongoDB (local or Atlas)
+- Google Cloud project with these APIs enabled:
+  - Maps JavaScript API
+  - Directions API
+  - Places API
+
+### Environment Variables
+
+Create a `.env` file:
+
+```env
+MONGODB_URI=mongodb+srv://...
+NEXTAUTH_SECRET=your-secret-here
+NEXTAUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-maps-api-key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Install & Run
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+yarn install
+yarn dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Seed the Database
 
-## Learn More
+Send a POST request to seed buildings, events, path nodes, and an admin user:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+curl -X POST http://localhost:3000/api/seed
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Default admin credentials:
+- Email: `admin@cu.edu.ng`
+- Password: `Admin@123`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
+```
+app/
+  (auth)/login     - Authentication page
+  admin/           - Admin dashboard (protected)
+  api/             - API routes
+  page.tsx         - Main navigator page
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+components/
+  admin/           - Admin forms (building, event)
+  auth/            - Auth provider, user menu
+  navigation/      - Directions panel
+  shared/          - Shared utilities
+  ui/              - Radix/shadcn components
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+hooks/             - Custom React hooks
+models/            - Mongoose schemas & interfaces
+data/seed/         - Seed data for buildings & path nodes
+lib/               - Auth config, DB connection, validators
+```
+
+## Admin Roles
+
+| Role | Permissions |
+|------|-------------|
+| `user` | View buildings, events, save locations |
+| `admin` | + Manage buildings and events |
+| `super_admin` | + Manage users, change roles |

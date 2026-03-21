@@ -165,8 +165,8 @@ export default function BuildingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Buildings</h1>
-          <p className="text-neutral-600">Manage campus buildings</p>
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Buildings</h1>
+          <p className="text-neutral-600 dark:text-neutral-400">Manage campus buildings</p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>

@@ -1,9 +1,10 @@
 "use client";
 
-import { Clock, MapPin, Navigation, X, Bookmark, Share2, Loader2 } from "lucide-react";
+import { Clock, MapPin, Navigation, X, Bookmark, Share2, Accessibility } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { IBuilding } from "@/models/interface/building.interface";
 import { Button } from "./ui/button";
+import Image from "next/image";
 import { useSavedLocations } from "@/hooks/use-saved-locations";
 import { toast } from "sonner";
 
@@ -69,9 +70,9 @@ export function BuildingDetailDrawer({
       />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 bottom-0 w-full md:w-96 bg-white shadow-2xl z-50 animate-slideInRight flex flex-col max-w-full">
+      <div className="fixed right-0 top-0 bottom-0 w-full md:w-96 bg-white dark:bg-neutral-900 shadow-2xl z-50 animate-slideInRight flex flex-col max-w-full">
         {/* Header */}
-        <div className="p-4 md:p-6 border-b border-neutral-200">
+        <div className="p-4 md:p-6 border-b border-neutral-200 dark:border-neutral-700">
           <div className="flex items-start justify-between mb-4">
             <h2 className="text-neutral-900 pr-8 text-lg md:text-xl font-semibold">
               {building.name}
@@ -80,16 +81,18 @@ export function BuildingDetailDrawer({
               onClick={onClose}
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors flex-shrink-0"
             >
-              <X className="w-5 h-5 text-neutral-600" />
+              <X className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
             </button>
           </div>
 
           {/* Building Image */}
-          <div className="w-full h-40 md:h-48 bg-neutral-100 rounded-lg overflow-hidden">
-            <img
+          <div className="w-full h-40 md:h-48 bg-neutral-100 rounded-lg overflow-hidden relative">
+            <Image
               src={building.image || "https://images.unsplash.com/photo-1667273704095-66c1e361cfdb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1bml2ZXJzaXR5JTIwYnVpbGRpbmclMjBleHRlcmlvcnxlbnwxfHx8fDE3NjU2MjIyODl8MA&ixlib=rb-4.1.0&q=80&w=1080"}
               alt={building.name}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized={building.image?.startsWith("/uploads") || false}
             />
           </div>
         </div>
@@ -99,7 +102,7 @@ export function BuildingDetailDrawer({
           {/* Description */}
           {building.description && (
             <div className="mb-6">
-              <div className="text-sm text-neutral-600">
+              <div className="text-sm text-neutral-600 dark:text-neutral-400">
                 {building.description}
               </div>
             </div>
@@ -109,8 +112,8 @@ export function BuildingDetailDrawer({
           {building.hours && (
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
-                <Clock className="w-4 h-4 text-neutral-500" />
-                <h3 className="text-sm font-medium text-neutral-900">
+                <Clock className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
+                <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                   Opening Hours
                 </h3>
               </div>
@@ -124,8 +127,8 @@ export function BuildingDetailDrawer({
           {building.departments && building.departments.length > 0 && (
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
-                <MapPin className="w-4 h-4 text-neutral-500" />
-                <h3 className="text-sm font-medium text-neutral-900">
+                <MapPin className="w-4 h-4 text-neutral-500 dark:text-neutral-400" />
+                <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
                   Departments & Facilities
                 </h3>
               </div>
@@ -133,7 +136,7 @@ export function BuildingDetailDrawer({
                 {building.departments.map((dept, index) => (
                   <div
                     key={index}
-                    className="text-sm text-neutral-600 py-1.5 border-b border-neutral-100 last:border-0"
+                    className="text-sm text-neutral-600 py-1.5 border-b border-neutral-100 dark:border-neutral-800 last:border-0"
                   >
                     {dept}
                   </div>
@@ -152,7 +155,7 @@ export function BuildingDetailDrawer({
                 {building.amenities.map((amenity, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 bg-neutral-100 text-neutral-600 text-xs rounded-full"
+                    className="px-2 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 text-xs rounded-full"
                   >
                     {amenity}
                   </span>
@@ -162,11 +165,11 @@ export function BuildingDetailDrawer({
           )}
 
           {/* Additional Info */}
-          <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-200">
+          <div className="bg-neutral-50 dark:bg-neutral-800 rounded-lg p-4 border border-neutral-200 dark:border-neutral-700">
             <div className="text-xs text-neutral-500 mb-2">
               Location Information
             </div>
-            <div className="text-sm text-neutral-700">
+            <div className="text-sm text-neutral-700 dark:text-neutral-300">
               Map Position: {building.coordinates.x.toFixed(1)}%, {building.coordinates.y.toFixed(1)}%
             </div>
             {building.floor_count && (
@@ -174,16 +177,15 @@ export function BuildingDetailDrawer({
                 Floors: {building.floor_count}
               </div>
             )}
-            {building.accessibility && (
-              <div className="text-sm text-green-600 mt-1">
-                ♿ Wheelchair Accessible
-              </div>
-            )}
+            <div className={`text-sm mt-1 flex items-center gap-1.5 ${building.accessibility ? "text-green-600" : "text-neutral-400"}`}>
+              <Accessibility className="w-4 h-4" />
+              {building.accessibility ? "Wheelchair Accessible" : "Not Wheelchair Accessible"}
+            </div>
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 border-t border-neutral-200 bg-neutral-50">
+        <div className="p-6 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800">
           <button
             onClick={() => onGetDirections?.(building)}
             className="w-full py-3 bg-[#1F7A4D] text-white rounded-lg hover:bg-[#196841] transition-colors flex items-center justify-center gap-2 shadow-sm"

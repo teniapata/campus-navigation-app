@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Calendar, Plus, Trash2, Loader2 } from "lucide-react";
+import { Calendar, Plus, Trash2, Loader2, ArrowLeft, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { EventForm, EventFormValues } from "@/components/admin/event-form";
 
 interface Event {
   _id: string;
@@ -41,6 +43,9 @@ interface Event {
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     fetchEvents();
@@ -56,6 +61,37 @@ export default function EventsPage() {
       toast.error("Failed to fetch events");
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleCreate(data: EventFormValues) {
+    setIsSubmitting(true);
+    try {
+      const body = {
+        ...data,
+        attendeeLimit: data.attendeeLimit ? parseInt(data.attendeeLimit) : undefined,
+        image: data.image || undefined,
+      };
+
+      const response = await fetch("/api/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || "Failed to create event");
+      }
+
+      toast.success("Event created successfully");
+      setShowForm(false);
+      fetchEvents();
+    } catch (error) {
+      console.error("Error creating event:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to create event");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -102,16 +138,41 @@ export default function EventsPage() {
     );
   }
 
+  if (showForm) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => setShowForm(false)}>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Create Event</h1>
+            <p className="text-neutral-600 dark:text-neutral-400">Add a new campus event</p>
+          </div>
+        </div>
+
+        <Card>
+          <CardContent className="pt-6">
+            <EventForm onSubmit={handleCreate} isLoading={isSubmitting} />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Events</h1>
-          <p className="text-neutral-600">Manage campus events</p>
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Events</h1>
+          <p className="text-neutral-600 dark:text-neutral-400">Manage campus events</p>
         </div>
-        <Button className="bg-[#1F7A4D] hover:bg-[#196841]" disabled>
+        <Button
+          className="bg-[#1F7A4D] hover:bg-[#196841]"
+          onClick={() => setShowForm(true)}
+        >
           <Plus className="w-4 h-4 mr-2" />
-          Add Event (Coming Soon)
+          Add Event
         </Button>
       </div>
 
@@ -154,6 +215,14 @@ export default function EventsPage() {
                     </TableCell>
                     <TableCell>{event.organizer}</TableCell>
                     <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => router.push(`/admin/events/${event._id}`)}
+                        className="text-neutral-600 hover:text-neutral-900 dark:text-neutral-100"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button

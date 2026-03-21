@@ -44,20 +44,20 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-      <div className="max-w-md w-full mx-4 p-8 bg-white rounded-xl shadow-lg border border-neutral-200">
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950">
+      <div className="max-w-md w-full mx-4 p-8 bg-white dark:bg-neutral-900 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-800">
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-xl bg-[#1F7A4D] flex items-center justify-center mx-auto mb-4">
             <MapPin className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-neutral-900">
+          <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
             Campus Navigator
           </h1>
-          <p className="text-neutral-600 mt-2">Covenant University Portal</p>
+          <p className="text-neutral-600 dark:text-neutral-400 mt-2">Covenant University Portal</p>
         </div>
 
         {(error || loginError) && (
-          <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          <div className="mb-6 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-400">
             {error === "OAuthSignin" && "Error starting authentication"}
             {error === "OAuthCallback" && "Error during authentication"}
             {error === "OAuthAccountNotLinked" &&
@@ -73,7 +73,7 @@ function LoginContent() {
           <>
             <Button
               onClick={() => signIn("google", { callbackUrl })}
-              className="w-full bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 shadow-sm"
+              className="w-full bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 border border-neutral-300 dark:border-neutral-600 shadow-sm"
               size="lg"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -99,10 +99,10 @@ function LoginContent() {
 
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-neutral-200" />
+                <div className="w-full border-t border-neutral-200 dark:border-neutral-700" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-4 text-neutral-500">or</span>
+                <span className="bg-white dark:bg-neutral-900 px-4 text-neutral-500 dark:text-neutral-400">or</span>
               </div>
             </div>
 
@@ -115,7 +115,7 @@ function LoginContent() {
               Admin Login
             </Button>
 
-            <p className="text-xs text-center text-neutral-500 mt-6">
+            <p className="text-xs text-center text-neutral-500 dark:text-neutral-400 mt-6">
               Sign in to access saved locations and personalized features
             </p>
           </>
@@ -180,8 +180,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-          <div className="animate-pulse">Loading...</div>
+        <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950">
+          <div className="animate-pulse text-neutral-600 dark:text-neutral-400">Loading...</div>
         </div>
       }
     >

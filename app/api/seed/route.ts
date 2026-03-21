@@ -9,6 +9,8 @@ import {
   covenantUniversityBuildings,
   sampleEvents,
 } from "@/data/seed/buildings";
+import { campusPathNodes } from "@/data/seed/path-nodes";
+import { PathNode } from "@/models/schemas/path-node.schema";
 
 // Default admin credentials
 const DEFAULT_ADMIN = {
@@ -53,6 +55,7 @@ export async function POST(request: NextRequest) {
     if (force) {
       await Building.deleteMany({});
       await Event.deleteMany({});
+      await PathNode.deleteMany({});
     }
 
     // Insert buildings
@@ -104,12 +107,31 @@ export async function POST(request: NextRequest) {
 
     const insertedEvents = await Event.insertMany(eventsWithRefs);
 
+    // Seed path nodes with building ID references
+    const pathNodesWithRefs = campusPathNodes.map((node) => {
+      const resolved: Record<string, unknown> = { ...node };
+      if (node.buildingName) {
+        const building = insertedBuildings.find(
+          (b) => b.name === node.buildingName
+        );
+        if (building) {
+          resolved.buildingId = building._id.toString();
+        }
+      }
+      delete resolved.buildingName;
+      return resolved;
+    });
+
+    await PathNode.deleteMany({});
+    const insertedPathNodes = await PathNode.insertMany(pathNodesWithRefs);
+
     return NextResponse.json({
       success: true,
       message: "Database seeded successfully",
       data: {
         buildings: insertedBuildings.length,
         events: insertedEvents.length,
+        pathNodes: insertedPathNodes.length,
       },
       admin: {
         email: DEFAULT_ADMIN.email,
@@ -145,7 +167,7 @@ export async function GET() {
       },
       seeded: buildingCount > 0,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to check database status" },
       { status: 500 }

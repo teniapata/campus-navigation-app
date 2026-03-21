@@ -7,13 +7,22 @@ import { BuildingDetailDrawer } from "./building-detail-drawer";
 import { Sidebar } from "./sidebar";
 import { TopNav } from "./top-nav";
 import { useBuildings } from "@/hooks/use-buildings";
+import { useEvents } from "@/hooks/use-events";
+import { useSavedLocations } from "@/hooks/use-saved-locations";
 import { GoogleMapView } from "./google-map-view";
-import { GoogleDirectionsPanel } from "./navigation/google-directions-panel";
+import { GoogleDirectionsPanel, TravelMode } from "./navigation/google-directions-panel";
 
 interface GoogleDirectionsInfo {
   distance: string;
   duration: string;
-  steps: { instruction: string; distance: string }[];
+  steps: {
+    instruction: string;
+    distance: string;
+    startLat: number;
+    startLng: number;
+    endLat: number;
+    endLng: number;
+  }[];
 }
 
 interface CustomLocation {
@@ -42,9 +51,17 @@ export default function Navigator() {
   const [toBuilding, setToBuilding] = useState<IBuilding | null>(null);
   const [customFromLocation, setCustomFromLocation] = useState<CustomLocation | null>(null);
   const [directionsInfo, setDirectionsInfo] = useState<GoogleDirectionsInfo | null>(null);
+  const [accessibleRoute, setAccessibleRoute] = useState(false);
+  const [travelMode, setTravelMode] = useState<TravelMode>("WALKING");
+  const [eventCategory, setEventCategory] = useState("all");
 
-  // Fetch buildings from API
+  // Fetch buildings and events from API
   const { buildings, isLoading: buildingsLoading } = useBuildings();
+  const { savedLocations, removeLocation } = useSavedLocations();
+  const { events } = useEvents({
+    category: eventCategory !== "all" ? eventCategory : undefined,
+    upcoming: true,
+  });
 
   // Filter buildings based on search and filters
   const filteredBuildings = useMemo(() => {
@@ -117,8 +134,12 @@ export default function Navigator() {
     const leg = route.legs[0];
 
     const steps = leg.steps.map((step) => ({
-      instruction: step.instructions.replace(/<[^>]*>/g, ""), // Strip HTML tags
+      instruction: step.instructions.replace(/<[^>]*>/g, ""),
       distance: step.distance?.text || "",
+      startLat: step.start_location.lat(),
+      startLng: step.start_location.lng(),
+      endLat: step.end_location.lat(),
+      endLng: step.end_location.lng(),
     }));
 
     setDirectionsInfo({
@@ -140,7 +161,7 @@ export default function Navigator() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-neutral-50">
+    <div className="h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950">
       <TopNav activeTab={activeTab} onTabChange={setActiveTab} />
 
       <div className="flex-1 flex overflow-hidden">
@@ -165,6 +186,14 @@ export default function Navigator() {
           onHoverBuilding={setHoveredBuilding}
           isOpen={isSidebarOpen}
           onToggleOpen={setIsSidebarOpen}
+          activeTab={activeTab}
+          events={events}
+          eventCategory={eventCategory}
+          onEventCategoryChange={setEventCategory}
+          savedLocations={savedLocations}
+          onRemoveSavedLocation={async (id) => {
+            try { await removeLocation(id); } catch {}
+          }}
         />
 
         <div className="flex-1 relative">
@@ -177,6 +206,7 @@ export default function Navigator() {
             navigationMode={navigationMode}
             onDirectionsCalculated={handleDirectionsCalculated}
             customFromLocation={customFromLocation}
+            travelMode={travelMode}
           />
 
           {/* Navigation Panel */}
@@ -202,6 +232,16 @@ export default function Navigator() {
                 if (location) {
                   setDirectionsInfo(null);
                 }
+              }}
+              accessibleRoute={accessibleRoute}
+              onToggleAccessible={(value) => {
+                setAccessibleRoute(value);
+                setDirectionsInfo(null);
+              }}
+              travelMode={travelMode}
+              onTravelModeChange={(mode) => {
+                setTravelMode(mode);
+                setDirectionsInfo(null);
               }}
             />
           )}
