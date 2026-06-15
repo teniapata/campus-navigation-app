@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { LogIn, LogOut, Settings, User } from "lucide-react";
 import {
   DropdownMenu,
@@ -23,13 +23,13 @@ export function UserMenu() {
 
   if (!session) {
     return (
-      <button
-        onClick={() => signIn("google")}
+      <Link
+        href="/login"
         className="flex items-center gap-2 px-3 py-1.5 text-sm text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
       >
         <LogIn className="w-4 h-4" />
         <span className="hidden sm:inline">Sign In</span>
-      </button>
+      </Link>
     );
   }
 
